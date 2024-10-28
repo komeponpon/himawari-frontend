@@ -6,7 +6,6 @@ import { styled } from '@mui/system';
 import logoImage from '../assets/images/logo.png';
 import { TypographyProps } from '@mui/material/Typography';
 
-// スタイル付きTypographyコンポーネントの定義
 const StyledTypography = styled(Typography)<TypographyProps>({
   color: '#FFDD55',
   fontFamily: "'Lato', sans-serif !important",
@@ -50,18 +49,17 @@ export default function AppBarComponent(props: Props) {
                   height: '40px',
                   width: 'auto',
                   marginRight: '12px'
-                }} 
+                }}
               />
-              {/* スタイル付きTypographyの使用 */}
-              <StyledTypography 
-                variant="h4" 
+              <StyledTypography
+                variant="h4"
                 component="h1"
                 className="app-title"
                 sx={{
-                  fontSize: { xs: '1.5rem', sm: '1.5rem' }, // レスポンシブ対応
-                  transition: 'color 0.3s ease', // ホバーエフェクト用
+                  fontSize: { xs: '1.5rem', sm: '1.5rem' },
+                  transition: 'color 0.3s ease',
                   '&:hover': {
-                    color: '#FFE477' // ホバー時の色
+                    color: '#FFE477'
                   }
                 }}
               >
