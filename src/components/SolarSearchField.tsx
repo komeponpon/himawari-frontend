@@ -6,7 +6,7 @@ export default function SolarSearchField() {
   const [leaseCompany, setLeaseCompany] = useState<string>(""); //リース会社
   const [leasePeriod, setLeasePeriod] = useState<string>(""); //リース期間
   const [moduleModel, setModuleModel] = useState<string>(""); //モジュールモデル
-  const [moduleCount, setModuleCount] = useState<number>(0); //モジュール枚数
+  const [moduleCount, setModuleCount] = useState<string>(""); //モジュール枚数
   const [roofMaterial, setRoofMaterial] = useState<string>(""); //屋根材
   const [installationPoints, setInstallationPoints] = useState<string>(""); //施工
   const [totalModuleOutput, setTotalModuleOutput] = useState<number>(0); //モジュール合計出力
@@ -23,7 +23,8 @@ export default function SolarSearchField() {
     { value: "15年", label: "15年" }
   ];
   const moduleModelOptions = [
-    { value: "SPR-MAX3-400", label: "SPR-MAX3-400" }
+    { value: "SPR-MAX3-400", label: "maxeon 400W" },
+    { value: "SS430M8GFH-18/VNH", label: "SI SOLAR 430W" }
   ];
   const roofMaterialOptions = [
     { value: "立平葺", label: "立平葺" },
@@ -33,6 +34,10 @@ export default function SolarSearchField() {
     { value: "6点", label: "6点" },
     { value: "8点", label: "8点" }
   ];
+  const moduleCountOptions = Array.from({length: 33}, (_, i) => i + 8).map(num => ({
+    value: num.toString(),
+    label: `${num}枚`
+  }));
 
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -120,6 +125,23 @@ export default function SolarSearchField() {
             options={roofMaterialOptions}
             value={roofMaterial}
             onChange={setRoofMaterial}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              mb: 1,
+              fontWeight: 'bold',
+              color: '#444'
+            }}
+          >
+            モジュール枚数
+          </Typography>
+          <BasicSelect
+            options={moduleCountOptions}
+            value={moduleCount}
+            onChange={setModuleCount}
           />
         </Grid>
       </Grid>

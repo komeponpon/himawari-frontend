@@ -29,6 +29,18 @@ export default function BasicSelect({ options, onChange, value }: BasicSelectPro
             }
             return options.find(opt => opt.value === selected)?.label;
           }}
+          sx={{
+            borderRadius: 1,
+          }}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                boxShadow: 'none',
+                border: '0.5px solid rgba(0, 0, 0, 0.1)',
+                borderRadius: 5,
+              },
+            },
+          }}
         >
           <MenuItem value="">
             <span>指定なし</span>
