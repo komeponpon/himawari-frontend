@@ -1,6 +1,6 @@
 import AppBarComponent from '../components/AppBar';
 import { Box, Typography } from '@mui/material';
-
+import SolarSearchField from '../components/SolarSearchField';
 export default function SolarSystemSearch() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -26,6 +26,7 @@ export default function SolarSystemSearch() {
             太陽光リースコード検索
           </Typography>
         </Box>
+        <SolarSearchField />
       </Box>
     </Box>
   )

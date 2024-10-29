@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -14,17 +13,8 @@ const StyledTypography = styled(Typography)<TypographyProps>({
   textShadow: '1px 1px 3px rgba(0, 0, 0, 0)',
 });
 
-interface Props {
-  window?: () => Window;
-}
 
-export default function AppBarComponent(props: Props) {
-  const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const handleDrawerToggle = () => {
-    setMobileOpen((prevState) => !prevState);
-  };
-
+export default function AppBarComponent() {
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar component="nav"
