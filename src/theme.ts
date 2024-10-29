@@ -3,7 +3,10 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   typography: {
     fontFamily: [
-      'Lato',
+      'Meiryo',
+      'メイリオ',
+      'Hiragino Kaku Gothic Pro',
+      'ヒラギノ角ゴ Pro W3',
       '-apple-system',
       'BlinkMacSystemFont',
       '"Segoe UI"',

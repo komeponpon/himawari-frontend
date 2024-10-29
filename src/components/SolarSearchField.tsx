@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Typography, Grid } from "@mui/material";
 import BasicSelect from "./BasicSelect";
 import { useState } from "react";
 
@@ -37,10 +37,10 @@ export default function SolarSearchField() {
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
       <Grid container spacing={3}>
-        <Grid item xs={4}>
-          <Typography 
-            variant="subtitle1" 
-            sx={{ 
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
               mb: 1,
               fontWeight: 'bold',
               color: '#333'
@@ -54,10 +54,10 @@ export default function SolarSearchField() {
             onChange={setLeaseCompany}
           />
         </Grid>
-        <Grid item xs={4}>
-          <Typography 
-            variant="subtitle1" 
-            sx={{ 
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
               mb: 1,
               fontWeight: 'bold',
               color: '#333'
@@ -71,13 +71,13 @@ export default function SolarSearchField() {
             onChange={setLeasePeriod}
           />
         </Grid>
-        <Grid item xs={4}>
-          <Typography 
-            variant="subtitle1" 
-            sx={{ 
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
               mb: 1,
               fontWeight: 'bold',
-              color: '#333'
+              color: '#444'
             }}
           >
             モジュール種類
@@ -88,13 +88,13 @@ export default function SolarSearchField() {
             onChange={setModuleModel}
           />
         </Grid>
-        <Grid item xs={4}>
-          <Typography 
-            variant="subtitle1" 
-            sx={{ 
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
               mb: 1,
               fontWeight: 'bold',
-              color: '#333'
+              color: '#444'
             }}
           >
             施工点数
@@ -105,13 +105,13 @@ export default function SolarSearchField() {
             onChange={setInstallationPoints}
           />
         </Grid>
-        <Grid item xs={4}>
-          <Typography 
-            variant="subtitle1" 
-            sx={{ 
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
               mb: 1,
               fontWeight: 'bold',
-              color: '#333'
+              color: '#444'
             }}
           >
             屋根材

@@ -25,13 +25,13 @@ export default function BasicSelect({ options, onChange, value }: BasicSelectPro
           displayEmpty
           renderValue={(selected) => {
             if (!selected) {
-              return <em style={{ color: 'gray' }}>選択してください</em>;
+              return <span style={{ color: 'gray' }}>選択</span>;
             }
             return options.find(opt => opt.value === selected)?.label;
           }}
         >
           <MenuItem value="">
-            <em>指定なし</em>
+            <span>指定なし</span>
           </MenuItem>
           {options.map((option) => (
             <MenuItem key={option.value} value={option.value}>
