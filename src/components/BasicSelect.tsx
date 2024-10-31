@@ -1,8 +1,9 @@
 import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import ClearIcon from '@mui/icons-material/Clear';
+import { IconButton } from '@mui/material';
 
 interface BasicSelectProps {
   options: { value: string | number; label: string }[];
@@ -13,6 +14,27 @@ interface BasicSelectProps {
 export default function BasicSelect({ options, onChange, value }: BasicSelectProps) {
   const handleChange = (event: SelectChangeEvent) => {
     onChange(event.target.value as string);
+  };
+
+  const CustomEndAdornment = () => {
+    if (!value) return null;
+    return (
+      <IconButton
+        size="small"
+        sx={{ 
+          mr: 0.5,
+          position: 'absolute',
+          right: '24px',
+          zIndex: 1,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onChange('');
+        }}
+      >
+        <ClearIcon fontSize="small" />
+      </IconButton>
+    );
   };
 
   return (
@@ -41,6 +63,7 @@ export default function BasicSelect({ options, onChange, value }: BasicSelectPro
               },
             },
           }}
+          endAdornment={<CustomEndAdornment />}
         >
           <MenuItem value="">
             <span>指定なし</span>

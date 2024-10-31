@@ -10,7 +10,7 @@ export default function SolarSearchField() {
   const [roofMaterial, setRoofMaterial] = useState<string>(""); //屋根材
   const [installationPoints, setInstallationPoints] = useState<string>(""); //施工
   const [totalModuleOutput, setTotalModuleOutput] = useState<number>(0); //モジュール合計出力
-  const [applicationPowerOutput, setApplicationPowerOutput] = useState<number>(0); //申請出力
+  const [applicationPowerOutput, setApplicationPowerOutput] = useState<string>(""); //申請出力
   const [monthlyLeaseFee, setMonthlyLeaseFee] = useState<number>(0); //月リース料
   const [totalLeaseAmount, setTotalLeaseAmount] = useState<number>(0); //総リース料
 
@@ -38,6 +38,14 @@ export default function SolarSearchField() {
     value: num.toString(),
     label: `${num}枚`
   }));
+  const applicationPowerOutputOptions = [
+    { value: "3.2", label: "3.2kW" },
+    { value: "3.6", label: "3.6kW" },
+    { value: "4.0", label: "4.0kW" },
+    { value: "5.9", label: "5.9kW" },
+    { value: "8.0", label: "8.0kW" },
+    { value: "9.9", label: "9.9kW" }
+  ];
 
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -85,12 +93,46 @@ export default function SolarSearchField() {
               color: '#444'
             }}
           >
-            モジュール種類
+            パネル種類
           </Typography>
           <BasicSelect
             options={moduleModelOptions}
             value={moduleModel}
             onChange={setModuleModel}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              mb: 1,
+              fontWeight: 'bold',
+              color: '#444'
+            }}
+          >
+            パネル枚数
+          </Typography>
+          <BasicSelect
+            options={moduleCountOptions}
+            value={moduleCount}
+            onChange={setModuleCount}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              mb: 1,
+              fontWeight: 'bold',
+              color: '#444'
+            }}
+          >
+            申請出力
+          </Typography>
+          <BasicSelect
+            options={applicationPowerOutputOptions}
+            value={applicationPowerOutput}
+            onChange={setApplicationPowerOutput}
           />
         </Grid>
         <Grid item xs={2}>
@@ -125,23 +167,6 @@ export default function SolarSearchField() {
             options={roofMaterialOptions}
             value={roofMaterial}
             onChange={setRoofMaterial}
-          />
-        </Grid>
-        <Grid item xs={2}>
-          <Typography
-            variant="subtitle1"
-            sx={{
-              mb: 1,
-              fontWeight: 'bold',
-              color: '#444'
-            }}
-          >
-            モジュール枚数
-          </Typography>
-          <BasicSelect
-            options={moduleCountOptions}
-            value={moduleCount}
-            onChange={setModuleCount}
           />
         </Grid>
       </Grid>
