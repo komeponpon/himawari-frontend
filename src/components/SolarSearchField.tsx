@@ -1,6 +1,7 @@
-import { Box, Typography, Grid, TextField } from "@mui/material";
+import { Box, Typography, Grid, TextField, IconButton } from "@mui/material";
 import BasicSelect from "./BasicSelect";
 import { useState } from "react";
+import ClearIcon from '@mui/icons-material/Clear';
 
 export default function SolarSearchField() {
   const [leaseCompany, setLeaseCompany] = useState<string>(""); //リース会社
@@ -144,7 +145,20 @@ export default function SolarSearchField() {
               onChange={(e) => setTotalModuleOutputMin(e.target.value)}
               inputProps={{ min: "0" }}
               InputProps={{
-                endAdornment: <Typography variant="caption">kW</Typography>
+                endAdornment: (
+                  <>
+                    {totalModuleOutputMin && (
+                      <IconButton
+                        size="small"
+                        onClick={() => setTotalModuleOutputMin("")}
+                        sx={{ p: 0.5, mr: 0.5 }}
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <Typography variant="caption">kW</Typography>
+                  </>
+                )
               }}
               sx={{ 
                 width: '45%',
@@ -161,7 +175,20 @@ export default function SolarSearchField() {
               onChange={(e) => setTotalModuleOutputMax(e.target.value)}
               inputProps={{ min: "0" }}
               InputProps={{
-                endAdornment: <Typography variant="caption">kW</Typography>
+                endAdornment: (
+                  <>
+                    {totalModuleOutputMax && (
+                      <IconButton
+                        size="small"
+                        onClick={() => setTotalModuleOutputMax("")}
+                        sx={{ p: 0.5, mr: 0.5 }}
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <Typography variant="caption">kW</Typography>
+                  </>
+                )
               }}
               sx={{ 
                 width: '45%',
@@ -242,7 +269,20 @@ export default function SolarSearchField() {
               onChange={(e) => setMonthlyLeaseFeeMin(e.target.value)}
               inputProps={{ min: "0" }}
               InputProps={{
-                endAdornment: <Typography variant="caption">円</Typography>
+                endAdornment: (
+                  <>
+                    {monthlyLeaseFeeMin && (
+                      <IconButton
+                        size="small"
+                        onClick={() => setMonthlyLeaseFeeMin("")}
+                        sx={{ p: 0.5, mr: 0.5 }}
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <Typography variant="caption">円</Typography>
+                  </>
+                )
               }}
               sx={{ 
                 width: '60%',
@@ -259,7 +299,20 @@ export default function SolarSearchField() {
               onChange={(e) => setMonthlyLeaseFeeMax(e.target.value)}
               inputProps={{ min: "0" }}
               InputProps={{
-                endAdornment: <Typography variant="caption">円</Typography>
+                endAdornment: (
+                  <>
+                    {monthlyLeaseFeeMax && (
+                      <IconButton
+                        size="small"
+                        onClick={() => setMonthlyLeaseFeeMax("")}
+                        sx={{ p: 0.5, mr: 0.5 }}
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <Typography variant="caption">円</Typography>
+                  </>
+                )
               }}
               sx={{ 
                 width: '60%',
@@ -290,7 +343,20 @@ export default function SolarSearchField() {
                 onChange={(e) => setMonthlyLeaseFee10To15YearMin(e.target.value)}
                 inputProps={{ min: "0" }}
                 InputProps={{
-                  endAdornment: <Typography variant="caption">円</Typography>
+                  endAdornment: (
+                    <>
+                      {monthlyLeaseFee10To15YearMin && (
+                        <IconButton
+                          size="small"
+                          onClick={() => setMonthlyLeaseFee10To15YearMin("")}
+                          sx={{ p: 0.5, mr: 0.5 }}
+                        >
+                          <ClearIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                      <Typography variant="caption">円</Typography>
+                    </>
+                  )
                 }}
                 sx={{ 
                   width: '60%',
@@ -307,7 +373,20 @@ export default function SolarSearchField() {
                 onChange={(e) => setMonthlyLeaseFee10To15YearMax(e.target.value)}
                 inputProps={{ min: "0" }}
                 InputProps={{
-                  endAdornment: <Typography variant="caption">円</Typography>
+                  endAdornment: (
+                    <>
+                      {monthlyLeaseFee10To15YearMax && (
+                        <IconButton
+                          size="small"
+                          onClick={() => setMonthlyLeaseFee10To15YearMax("")}
+                          sx={{ p: 0.5, mr: 0.5 }}
+                        >
+                          <ClearIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                      <Typography variant="caption">円</Typography>
+                    </>
+                  )
                 }}
                 sx={{ 
                   width: '60%',
@@ -338,7 +417,20 @@ export default function SolarSearchField() {
               onChange={(e) => setTotalLeaseFeeMin(e.target.value)}
               inputProps={{ min: "0" }}
               InputProps={{
-                endAdornment: <Typography variant="caption">円</Typography>
+                endAdornment: (
+                  <>
+                    {totalLeaseFeeMin && (
+                      <IconButton
+                        size="small"
+                        onClick={() => setTotalLeaseFeeMin("")}
+                        sx={{ p: 0.5, mr: 0.5 }}
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <Typography variant="caption">円</Typography>
+                  </>
+                )
               }}
               sx={{ 
                 width: '60%',
@@ -355,7 +447,20 @@ export default function SolarSearchField() {
               onChange={(e) => setTotalLeaseFeeMax(e.target.value)}
               inputProps={{ min: "0" }}
               InputProps={{
-                endAdornment: <Typography variant="caption">円</Typography>
+                endAdornment: (
+                  <>
+                    {totalLeaseFeeMax && (
+                      <IconButton
+                        size="small"
+                        onClick={() => setTotalLeaseFeeMax("")}
+                        sx={{ p: 0.5, mr: 0.5 }}
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <Typography variant="caption">円</Typography>
+                  </>
+                )
               }}
               sx={{
                 width: '60%',
@@ -381,6 +486,17 @@ export default function SolarSearchField() {
             size="small"
             value={applicationCode}
             onChange={(e) => setApplicationCode(e.target.value)}
+            InputProps={{
+              endAdornment: applicationCode && (
+                <IconButton
+                  size="small"
+                  onClick={() => setApplicationCode("")}
+                  sx={{ p: 0.5 }}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              )
+            }}
             sx={{ 
               width: '100%',
               '& .MuiInputBase-root': {

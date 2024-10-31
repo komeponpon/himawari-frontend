@@ -4,7 +4,7 @@ import SolarSearchField from '../components/SolarSearchField';
 export default function SolarSystemSearch() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-       <AppBarComponent /> 
+      <AppBarComponent />
       <Box sx={{
         paddingTop: '64px',
         minHeight: '100vh',
