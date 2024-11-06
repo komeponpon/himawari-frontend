@@ -2,6 +2,8 @@ import { Box, Typography, Grid, TextField, IconButton } from "@mui/material";
 import BasicSelect from "./BasicSelect";
 import { useState } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
+import BasicRadioButton from "./BasicRadioButton";
+import { BasicButton } from "./BasicButton";
 
 export default function SolarSearchField() {
   const [leaseCompany, setLeaseCompany] = useState<string>(""); //リース会社
@@ -20,6 +22,7 @@ export default function SolarSearchField() {
   const [applicationCode, setApplicationCode] = useState<string>(""); // 申込コード
   const [monthlyLeaseFee10To15YearMin, setMonthlyLeaseFee10To15YearMin] = useState<string>("");
   const [monthlyLeaseFee10To15YearMax, setMonthlyLeaseFee10To15YearMax] = useState<string>("");
+  const [region, setRegion] = useState<string>("通常"); // 対応地域
 
   const leaseCompanyOptions = [
     { value: "大阪ガスファイナンス", label: "大阪ガスファイナンス" },
@@ -54,10 +57,53 @@ export default function SolarSearchField() {
     { value: "8.0", label: "8.0kW" },
     { value: "9.9", label: "9.9kW" }
   ];
+  const regionOptions = [
+    { value: "通常", label: "通常" },
+    { value: "多雪", label: "多雪" }
+  ];
+
+  const handleClear = () => {
+    setLeaseCompany("");
+    setLeasePeriod("");
+    setModuleModel("");
+    setModuleCount("");
+    setRoofMaterial("");
+    setInstallationPoints("");
+    setApplicationPowerOutput("");
+    setTotalModuleOutputMin("");
+    setTotalModuleOutputMax("");
+    setMonthlyLeaseFeeMin("");
+    setMonthlyLeaseFeeMax("");
+    setTotalLeaseFeeMin("");
+    setTotalLeaseFeeMax("");
+    setApplicationCode("");
+    setMonthlyLeaseFee10To15YearMin("");
+    setMonthlyLeaseFee10To15YearMax("");
+    setRegion("通常");
+  };
 
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              mb: 1,
+              fontWeight: 'bold',
+              color: '#333'
+            }}
+          >
+            対応地域
+          </Typography>
+          <BasicRadioButton
+            label=""
+            options={regionOptions}
+            value={region}
+            onChange={setRegion}
+            row={true}
+          />
+        </Grid>
         <Grid item xs={2}>
           <Typography
             variant="subtitle1"
@@ -126,7 +172,7 @@ export default function SolarSearchField() {
             onChange={setModuleCount}
           />
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <Typography
             variant="subtitle1"
             sx={{
@@ -506,6 +552,38 @@ export default function SolarSearchField() {
           />
         </Grid>
       </Grid>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 10 }}>
+        <BasicButton
+          variant="contained"
+          onClick={() => console.log("検索実行")}
+          sx={{ 
+            width: '200px',
+            backgroundColor: '#F7B52C',
+            boxShadow: 'none',
+            '&:hover': {
+              backgroundColor: '#FFC44D',
+              boxShadow: 'none'
+            }
+          }}
+        >
+          検索
+        </BasicButton>
+        <BasicButton
+          variant="outlined"
+          onClick={handleClear}
+          sx={{ 
+            width: '200px',
+            borderColor: '#F7B52C',
+            color: '#F7B52C',
+            '&:hover': {
+              borderColor: '#FFC44D',
+              color: '#FFC44D'
+            }
+          }}
+        >
+          クリア
+        </BasicButton>
+      </Box>
     </Box>
   );
 }
