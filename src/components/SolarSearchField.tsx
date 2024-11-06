@@ -86,47 +86,52 @@ export default function SolarSearchField() {
   };
 
   const columns: Column[] = [
-    { id: 'leaseCompany', label: 'リース会社', minWidth: 140 },
-    { id: 'leasePeriod', label: 'リース期間', minWidth: 100 },
-    { id: 'moduleModel', label: 'パネル種類', minWidth: 130 },
-    { id: 'moduleCount', label: 'パネル枚数', minWidth: 100 },
-    { 
-      id: 'totalModuleOutput', 
-      label: 'パネル合計出力', 
-      minWidth: 120,
-      format: (value: number) => `${value}kW`
+    { id: 'leaseCompany', label: 'リース会社', minWidth: 140, sortable: true },
+    { id: 'leasePeriod', label: 'リース期間', minWidth: 100, sortable: true },
+    { id: 'moduleModel', label: 'パネル種類', minWidth: 130, sortable: true },
+    { id: 'moduleCount', label: 'パネル枚数', minWidth: 100, sortable: true },
+    {
+      id: 'totalModuleOutput',
+      label: 'パネル合計出力',
+      minWidth: 130,
+      format: (value: number) => `${value}kW`,
+      sortable: true
     },
-    { 
-      id: 'applicationPowerOutput', 
-      label: '申請出力', 
+    {
+      id: 'applicationPowerOutput',
+      label: '申請出力',
       minWidth: 100,
-      format: (value: number) => `${value}kW`
+      format: (value: number) => `${value}kW`,
+      sortable: true
     },
-    { id: 'region', label: '対応地域', minWidth: 100 },
-    { id: 'roofMaterial', label: '屋根材', minWidth: 100 },
-    { id: 'installationPoints', label: '施工点数', minWidth: 100 },
-    { 
-      id: 'monthlyLeaseFee', 
-      label: '月額リース料(1~10年)', 
-      minWidth: 200,
+    { id: 'region', label: '対応地域', minWidth: 100, sortable: true },
+    { id: 'roofMaterial', label: '屋根材', minWidth: 100, sortable: true },
+    { id: 'installationPoints', label: '施工点数', minWidth: 100, sortable: true },
+    {
+      id: 'monthlyLeaseFee',
+      label: '月額リース料(1~10年)',
+      minWidth: 190,
       align: 'right',
-      format: (value: number) => `¥${value.toLocaleString()}`
+      format: (value: number) => `¥${value.toLocaleString()}`,
+      sortable: true
     },
-    { 
-      id: 'monthlyLeaseFee10To15Year', 
-      label: '月額リース料(10~15年)', 
-      minWidth: 200,
+    {
+      id: 'monthlyLeaseFee10To15Year',
+      label: '月額リース料(10~15年)',
+      minWidth: 190,
       align: 'right',
-      format: (value: number | null) => value ? `¥${value.toLocaleString()}` : '-'
+      format: (value: number | null) => value ? `¥${value.toLocaleString()}` : '-',
+      sortable: true
     },
-    { 
-      id: 'totalLeaseFee', 
-      label: '総額リース料', 
+    {
+      id: 'totalLeaseFee',
+      label: '総額リース料',
       minWidth: 130,
       align: 'right',
-      format: (value: number) => `¥${value.toLocaleString()}`
+      format: (value: number) => `¥${value.toLocaleString()}`,
+      sortable: true
     },
-    { id: 'applicationCode', label: '申込コード', minWidth: 100 }
+    { id: 'applicationCode', label: '申込コード', minWidth: 120, sortable: true }
   ];
 
   const handleSearch = () => {

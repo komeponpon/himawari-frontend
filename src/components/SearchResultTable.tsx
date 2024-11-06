@@ -6,8 +6,10 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TablePagination
+  TablePagination,
+  TableSortLabel
 } from '@mui/material';
+import React from 'react';
 import { useState } from 'react';
 
 // カラム定義の型
@@ -17,6 +19,7 @@ export interface Column {
   minWidth?: number;
   align?: 'right' | 'left' | 'center';
   format?: (value: any) => string;
+  sortable?: boolean;
 }
 
 interface Props {
@@ -34,6 +37,8 @@ export default function SearchResultTable({
 }: Props) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
+  const [orderBy, setOrderBy] = useState<string>('');
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
@@ -43,6 +48,29 @@ export default function SearchResultTable({
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  const handleRequestSort = (property: string) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const sortedRows = React.useMemo(() => {
+    if (!orderBy) return rows;
+
+    return [...rows].sort((a, b) => {
+      const aValue = a[orderBy];
+      const bValue = b[orderBy];
+
+      if (aValue === null) return 1;
+      if (bValue === null) return -1;
+
+      if (order === 'desc') {
+        return bValue < aValue ? -1 : bValue > aValue ? 1 : 0;
+      }
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    });
+  }, [rows, order, orderBy]);
 
   return (
     <Paper 
@@ -67,14 +95,25 @@ export default function SearchResultTable({
                     backgroundColor: '#fafafa',
                     fontWeight: 600
                   }}
+                  sortDirection={orderBy === column.id ? order : false}
                 >
-                  {column.label}
+                  {column.sortable ? (
+                    <TableSortLabel
+                      active={orderBy === column.id}
+                      direction={orderBy === column.id ? order : 'asc'}
+                      onClick={() => handleRequestSort(column.id)}
+                    >
+                      {column.label}
+                    </TableSortLabel>
+                  ) : (
+                    column.label
+                  )}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
+            {sortedRows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => (
                 <TableRow 
