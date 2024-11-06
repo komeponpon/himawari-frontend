@@ -4,6 +4,7 @@ import { useState } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
 import BasicRadioButton from "./BasicRadioButton";
 import { BasicButton } from "./BasicButton";
+import SearchResultTable, { Column } from './SearchResultTable';
 
 export default function SolarSearchField() {
   const [leaseCompany, setLeaseCompany] = useState<string>(""); //リース会社
@@ -23,6 +24,7 @@ export default function SolarSearchField() {
   const [monthlyLeaseFee10To15YearMin, setMonthlyLeaseFee10To15YearMin] = useState<string>("");
   const [monthlyLeaseFee10To15YearMax, setMonthlyLeaseFee10To15YearMax] = useState<string>("");
   const [region, setRegion] = useState<string>("通常"); // 対応地域
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   const leaseCompanyOptions = [
     { value: "大阪ガスファイナンス", label: "大阪ガスファイナンス" },
@@ -80,6 +82,89 @@ export default function SolarSearchField() {
     setMonthlyLeaseFee10To15YearMin("");
     setMonthlyLeaseFee10To15YearMax("");
     setRegion("通常");
+    setSearchResults([]);
+  };
+
+  const columns: Column[] = [
+    { id: 'leaseCompany', label: 'リース会社', minWidth: 140 },
+    { id: 'leasePeriod', label: 'リース期間', minWidth: 100 },
+    { id: 'moduleModel', label: 'パネル種類', minWidth: 130 },
+    { id: 'moduleCount', label: 'パネル枚数', minWidth: 100 },
+    { 
+      id: 'totalModuleOutput', 
+      label: 'パネル合計出力', 
+      minWidth: 120,
+      format: (value: number) => `${value}kW`
+    },
+    { 
+      id: 'applicationPowerOutput', 
+      label: '申請出力', 
+      minWidth: 100,
+      format: (value: number) => `${value}kW`
+    },
+    { id: 'region', label: '対応地域', minWidth: 100 },
+    { id: 'roofMaterial', label: '屋根材', minWidth: 100 },
+    { id: 'installationPoints', label: '施工点数', minWidth: 100 },
+    { 
+      id: 'monthlyLeaseFee', 
+      label: '月額リース料(1~10年)', 
+      minWidth: 200,
+      align: 'right',
+      format: (value: number) => `¥${value.toLocaleString()}`
+    },
+    { 
+      id: 'monthlyLeaseFee10To15Year', 
+      label: '月額リース料(10~15年)', 
+      minWidth: 200,
+      align: 'right',
+      format: (value: number | null) => value ? `¥${value.toLocaleString()}` : '-'
+    },
+    { 
+      id: 'totalLeaseFee', 
+      label: '総額リース料', 
+      minWidth: 130,
+      align: 'right',
+      format: (value: number) => `¥${value.toLocaleString()}`
+    },
+    { id: 'applicationCode', label: '申込コード', minWidth: 100 }
+  ];
+
+  const handleSearch = () => {
+    const baseData = {
+      leaseCompany: ['大阪ガスファイナンス', 'TEPCOフィンテック'],
+      leasePeriod: ['10年', '15年'],
+      moduleModel: ['maxeon 400W', 'SI SOLAR 430W'],
+      moduleCount: [8, 10, 12, 14, 16],
+      totalModuleOutput: [3.2, 4.0, 4.8, 5.6, 6.4],
+      applicationPowerOutput: [3.2, 3.6, 4.0, 5.9, 8.0],
+      region: ['通常', '多雪'],
+      roofMaterial: ['立平葺', 'スレート', '瓦'],
+      installationPoints: ['6点', '8点'],
+    };
+
+    const mockResults = Array.from({ length: 100 }, (_, index) => {
+      const randomMonthlyFee = Math.floor(Math.random() * (30000 - 10000) + 10000);
+      const months = Math.random() < 0.5 ? 120 : 180; // 10年 or 15年
+      const totalFee = randomMonthlyFee * months;
+      
+      return {
+        leaseCompany: baseData.leaseCompany[Math.floor(Math.random() * baseData.leaseCompany.length)],
+        leasePeriod: baseData.leasePeriod[Math.floor(Math.random() * baseData.leasePeriod.length)],
+        moduleModel: baseData.moduleModel[Math.floor(Math.random() * baseData.moduleModel.length)],
+        moduleCount: baseData.moduleCount[Math.floor(Math.random() * baseData.moduleCount.length)],
+        totalModuleOutput: baseData.totalModuleOutput[Math.floor(Math.random() * baseData.totalModuleOutput.length)],
+        applicationPowerOutput: baseData.applicationPowerOutput[Math.floor(Math.random() * baseData.applicationPowerOutput.length)],
+        region: baseData.region[Math.floor(Math.random() * baseData.region.length)],
+        roofMaterial: baseData.roofMaterial[Math.floor(Math.random() * baseData.roofMaterial.length)],
+        installationPoints: baseData.installationPoints[Math.floor(Math.random() * baseData.installationPoints.length)],
+        monthlyLeaseFee: randomMonthlyFee,
+        monthlyLeaseFee10To15Year: months === 180 ? Math.floor(randomMonthlyFee * 0.8) : null,
+        totalLeaseFee: totalFee,
+        applicationCode: `C${index}${Math.random().toString(36).substring(2, 5).toUpperCase()}`
+      };
+    });
+
+    setSearchResults(mockResults);
   };
 
   return (
@@ -552,10 +637,10 @@ export default function SolarSearchField() {
           />
         </Grid>
       </Grid>
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 10 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 5, mt: 10 }}>
         <BasicButton
           variant="contained"
-          onClick={() => console.log("検索実行")}
+          onClick={handleSearch}
           sx={{ 
             width: '200px',
             backgroundColor: '#F7B52C',
@@ -584,6 +669,35 @@ export default function SolarSearchField() {
           クリア
         </BasicButton>
       </Box>
+      {searchResults.length > 0 && (
+        <>
+          <Box sx={{
+              paddingTop: '5rem',
+              display: 'flex',
+            }}>
+              <Typography
+                variant="h6"
+                component="h6"
+                sx={{
+                  fontFamily: "'Noto Sans JP', sans-serif",
+                  fontWeight: 600,
+                  color: '#444444',
+                  letterSpacing: '0.1em'
+                }}
+              >
+                検索結果
+              </Typography>
+          </Box>
+          <Box sx={{ mt: 4, width: '100%' }}>
+            <SearchResultTable 
+              columns={columns} 
+              rows={searchResults}
+              defaultRowsPerPage={10}
+              rowsPerPageOptions={[10, 25, 100]}
+            />
+          </Box>
+        </>
+      )}
     </Box>
   );
 }
