@@ -20,7 +20,7 @@ interface SolarSystemResponse {
   installation_points: string;
   monthly_lease_fee_10: number;
   monthly_lease_fee_15: number | null;
-  total_leace_amount: number;
+  total_lease_amount: number;
   application_code: string;
 }
 
@@ -178,11 +178,12 @@ export default function SolarSearchField() {
         Object.entries(params).filter(([_, v]) => v !== "" && v !== null)
       );
 
-      const response = await axios.get<SolarSystemResponse[]>('http://backend:5000/api/solar-systems/search', {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+      const response = await axios.get(`${apiUrl}/api/solar-systems/search`, {
         params: cleanParams
       });
 
-      const formattedResults = response.data.map((item) => ({
+      const formattedResults = (response.data as SolarSystemResponse[]).map((item) => ({
         leaseCompany: item.lease_company,
         leasePeriod: item.lease_period,
         moduleModel: item.module_model,
@@ -194,7 +195,7 @@ export default function SolarSearchField() {
         installationPoints: item.installation_points,
         monthlyLeaseFee: item.monthly_lease_fee_10,
         monthlyLeaseFee10To15Year: item.monthly_lease_fee_15,
-        totalLeaseFee: item.total_leace_amount,
+        totalLeaseFee: item.total_lease_amount,
         applicationCode: item.application_code,
       }));
 
