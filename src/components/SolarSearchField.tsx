@@ -154,6 +154,7 @@ export default function SolarSearchField() {
 
   const handleSearch = async () => {
     try {
+      console.log('API URL:', process.env.REACT_APP_API_URL);
       const params = {
         lease_company: leaseCompany,
         lease_period: leasePeriod,
@@ -178,10 +179,10 @@ export default function SolarSearchField() {
         Object.entries(params).filter(([_, v]) => v !== "" && v !== null)
       );
 
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-      const response = await axios.get(`${apiUrl}/api/solar-systems/search`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/solar-systems/search`, {
         params: cleanParams
       });
+      console.log('Response:', response);
 
       const formattedResults = (response.data as SolarSystemResponse[]).map((item) => ({
         leaseCompany: item.lease_company,
@@ -200,7 +201,13 @@ export default function SolarSearchField() {
       }));
 
       setSearchResults(formattedResults);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error details:', {
+        message: error.message,
+        config: error.config,
+        response: error.response,
+        env: process.env
+      });
       console.error('Search error:', error);
       alert('検索中にエラーが発生しました。');
     }
