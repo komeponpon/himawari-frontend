@@ -5,6 +5,24 @@ import ClearIcon from '@mui/icons-material/Clear';
 import BasicRadioButton from "./BasicRadioButton";
 import { BasicButton } from "./BasicButton";
 import SearchResultTable, { Column } from './SearchResultTable';
+import axios from 'axios';
+
+// レスポンスの型を定義
+interface SolarSystemResponse {
+  lease_company: string;
+  lease_period: string;
+  module_model: string;
+  module_count: string;
+  total_module_output: number;
+  application_power_output: number;
+  region: string;
+  roof_material: string;
+  installation_points: string;
+  monthly_lease_fee_10: number;
+  monthly_lease_fee_15: number | null;
+  total_leace_amount: number;
+  application_code: string;
+}
 
 export default function SolarSearchField() {
   const [leaseCompany, setLeaseCompany] = useState<string>(""); //リース会社
@@ -134,42 +152,57 @@ export default function SolarSearchField() {
     { id: 'applicationCode', label: '申込コード', minWidth: 120, sortable: true }
   ];
 
-  const handleSearch = () => {
-    const baseData = {
-      leaseCompany: ['大阪ガスファイナンス', 'TEPCOフィンテック'],
-      leasePeriod: ['10年', '15年'],
-      moduleModel: ['maxeon 400W', 'SI SOLAR 430W'],
-      moduleCount: [8, 10, 12, 14, 16],
-      totalModuleOutput: [3.2, 4.0, 4.8, 5.6, 6.4],
-      applicationPowerOutput: [3.2, 3.6, 4.0, 5.9, 8.0],
-      region: ['通常', '多雪'],
-      roofMaterial: ['立平葺', 'スレート', '瓦'],
-      installationPoints: ['6点', '8点'],
-    };
-
-    const mockResults = Array.from({ length: 100 }, (_, index) => {
-      const randomMonthlyFee = Math.floor(Math.random() * (30000 - 10000) + 10000);
-      const months = Math.random() < 0.5 ? 120 : 180; // 10年 or 15年
-      const totalFee = randomMonthlyFee * months;
-      
-      return {
-        leaseCompany: baseData.leaseCompany[Math.floor(Math.random() * baseData.leaseCompany.length)],
-        leasePeriod: baseData.leasePeriod[Math.floor(Math.random() * baseData.leasePeriod.length)],
-        moduleModel: baseData.moduleModel[Math.floor(Math.random() * baseData.moduleModel.length)],
-        moduleCount: baseData.moduleCount[Math.floor(Math.random() * baseData.moduleCount.length)],
-        totalModuleOutput: baseData.totalModuleOutput[Math.floor(Math.random() * baseData.totalModuleOutput.length)],
-        applicationPowerOutput: baseData.applicationPowerOutput[Math.floor(Math.random() * baseData.applicationPowerOutput.length)],
-        region: baseData.region[Math.floor(Math.random() * baseData.region.length)],
-        roofMaterial: baseData.roofMaterial[Math.floor(Math.random() * baseData.roofMaterial.length)],
-        installationPoints: baseData.installationPoints[Math.floor(Math.random() * baseData.installationPoints.length)],
-        monthlyLeaseFee: randomMonthlyFee,
-        monthlyLeaseFee10To15Year: months === 180 ? Math.floor(randomMonthlyFee * 0.8) : null,
-        totalLeaseFee: totalFee,
-        applicationCode: `C${index}${Math.random().toString(36).substring(2, 5).toUpperCase()}`
+  const handleSearch = async () => {
+    try {
+      const params = {
+        lease_company: leaseCompany,
+        lease_period: leasePeriod,
+        module_model: moduleModel,
+        module_count: moduleCount,
+        total_module_output_min: totalModuleOutputMin,
+        total_module_output_max: totalModuleOutputMax,
+        application_power_output: applicationPowerOutput,
+        region: region,
+        roof_material: roofMaterial,
+        installation_points: installationPoints,
+        monthly_lease_fee_min: monthlyLeaseFeeMin,
+        monthly_lease_fee_max: monthlyLeaseFeeMax,
+        monthly_lease_fee_10_to_15_year_min: monthlyLeaseFee10To15YearMin,
+        monthly_lease_fee_10_to_15_year_max: monthlyLeaseFee10To15YearMax,
+        total_lease_fee_min: totalLeaseFeeMin,
+        total_lease_fee_max: totalLeaseFeeMax,
+        application_code: applicationCode,
       };
-    });
 
-    setSearchResults(mockResults);
+      const cleanParams = Object.fromEntries(
+        Object.entries(params).filter(([_, v]) => v !== "" && v !== null)
+      );
+
+      const response = await axios.get<SolarSystemResponse[]>('http://backend:5000/api/solar-systems/search', {
+        params: cleanParams
+      });
+
+      const formattedResults = response.data.map((item) => ({
+        leaseCompany: item.lease_company,
+        leasePeriod: item.lease_period,
+        moduleModel: item.module_model,
+        moduleCount: item.module_count,
+        totalModuleOutput: item.total_module_output,
+        applicationPowerOutput: item.application_power_output,
+        region: item.region,
+        roofMaterial: item.roof_material,
+        installationPoints: item.installation_points,
+        monthlyLeaseFee: item.monthly_lease_fee_10,
+        monthlyLeaseFee10To15Year: item.monthly_lease_fee_15,
+        totalLeaseFee: item.total_leace_amount,
+        applicationCode: item.application_code,
+      }));
+
+      setSearchResults(formattedResults);
+    } catch (error) {
+      console.error('Search error:', error);
+      alert('検索中にエラーが発生しました。');
+    }
   };
 
   return (
