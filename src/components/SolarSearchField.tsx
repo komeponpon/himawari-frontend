@@ -154,35 +154,20 @@ export default function SolarSearchField() {
 
   const handleSearch = async () => {
     try {
-      console.log('API URL:', process.env.REACT_APP_API_URL);
       const params = {
         lease_company: leaseCompany,
         lease_period: leasePeriod,
         module_model: moduleModel,
         module_count: moduleCount,
-        total_module_output_min: totalModuleOutputMin,
-        total_module_output_max: totalModuleOutputMax,
-        application_power_output: applicationPowerOutput,
-        region: region,
-        roof_material: roofMaterial,
-        installation_points: installationPoints,
-        monthly_lease_fee_min: monthlyLeaseFeeMin,
-        monthly_lease_fee_max: monthlyLeaseFeeMax,
-        monthly_lease_fee_10_to_15_year_min: monthlyLeaseFee10To15YearMin,
-        monthly_lease_fee_10_to_15_year_max: monthlyLeaseFee10To15YearMax,
-        total_lease_fee_min: totalLeaseFeeMin,
-        total_lease_fee_max: totalLeaseFeeMax,
-        application_code: applicationCode,
+        region: region
       };
 
-      const cleanParams = Object.fromEntries(
-        Object.entries(params).filter(([_, v]) => v !== "" && v !== null)
-      );
-
+      console.log('Search parameters:', params);
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/solar-systems/search`, {
-        params: cleanParams
+        params: params
       });
-      console.log('Response:', response);
+
+      console.log('Response:', response.data);
 
       const formattedResults = (response.data as SolarSystemResponse[]).map((item) => ({
         leaseCompany: item.lease_company,
@@ -202,14 +187,19 @@ export default function SolarSearchField() {
 
       setSearchResults(formattedResults);
     } catch (error: any) {
-      console.error('Error details:', {
-        message: error.message,
-        config: error.config,
-        response: error.response,
-        env: process.env
-      });
-      console.error('Search error:', error);
-      alert('検索中にエラーが発生しました。');
+      if (error.response) {
+        console.error('API Error Response:', {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+          headers: error.response.headers
+        });
+        const errorMessage = error.response.data?.error || error.message;
+        alert(`検索エラー: ${errorMessage}`);
+      } else {
+        console.error('Unexpected error:', error);
+        alert('予期せぬエラーが発生しました');
+      }
     }
   };
 
