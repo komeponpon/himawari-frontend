@@ -154,20 +154,36 @@ export default function SolarSearchField() {
 
   const handleSearch = async () => {
     try {
-      const params = {
+      const params: { [key: string]: string | undefined } = {
         lease_company: leaseCompany,
         lease_period: leasePeriod,
         module_model: moduleModel,
         module_count: moduleCount,
-        region: region
+        region: region,
+        roof_material: roofMaterial,
+        installation_points: installationPoints,
+        application_power_output: applicationPowerOutput,
+        total_module_output_min: totalModuleOutputMin || undefined,
+        total_module_output_max: totalModuleOutputMax || undefined,
+        monthly_lease_fee_min: monthlyLeaseFeeMin || undefined,
+        monthly_lease_fee_max: monthlyLeaseFeeMax || undefined,
+        monthly_lease_fee_10_to_15_year_min: monthlyLeaseFee10To15YearMin || undefined,
+        monthly_lease_fee_10_to_15_year_max: monthlyLeaseFee10To15YearMax || undefined,
+        total_lease_fee_min: totalLeaseFeeMin || undefined,
+        total_lease_fee_max: totalLeaseFeeMax || undefined,
+        application_code: applicationCode || undefined
       };
+
+      Object.keys(params).forEach(key => {
+        if (params[key] === undefined || params[key] === '') {
+          delete params[key];
+        }
+      });
 
       console.log('Search parameters:', params);
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/solar-systems/search`, {
         params: params
       });
-
-      console.log('Response:', response.data);
 
       const formattedResults = (response.data as SolarSystemResponse[]).map((item) => ({
         leaseCompany: item.lease_company,
@@ -198,7 +214,7 @@ export default function SolarSearchField() {
         alert(`検索エラー: ${errorMessage}`);
       } else {
         console.error('Unexpected error:', error);
-        alert('予期せぬエラーが発生しました');
+        alert('予期せぬエラーが発生��ました');
       }
     }
   };
