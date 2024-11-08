@@ -70,12 +70,12 @@ export default function SolarSearchField() {
     label: `${num}枚`
   }));
   const applicationPowerOutputOptions = [
-    { value: "3.2", label: "3.2kW" },
-    { value: "3.6", label: "3.6kW" },
-    { value: "4.0", label: "4.0kW" },
-    { value: "5.9", label: "5.9kW" },
-    { value: "8.0", label: "8.0kW" },
-    { value: "9.9", label: "9.9kW" }
+    { value: 3.2, label: "3.2kW" },
+    { value: 3.6, label: "3.6kW" },
+    { value: 4.0, label: "4.0kW" },
+    { value: 5.9, label: "5.9kW" },
+    { value: 8.0, label: "8.0kW" },
+    { value: 9.9, label: "9.9kW" }
   ];
   const regionOptions = [
     { value: "通常", label: "通常" },
@@ -130,7 +130,7 @@ export default function SolarSearchField() {
       label: '月額リース料(1~10年)',
       minWidth: 190,
       align: 'right',
-      format: (value: number) => `¥${value.toLocaleString()}`,
+      format: (value: number) => `¥${value.toLocaleString('ja-JP')}`,
       sortable: true
     },
     {
@@ -138,7 +138,7 @@ export default function SolarSearchField() {
       label: '月額リース料(10~15年)',
       minWidth: 190,
       align: 'right',
-      format: (value: number | null) => value ? `¥${value.toLocaleString()}` : '-',
+      format: (value: number | null) => value ? `¥${value.toLocaleString('ja-JP')}` : '-',
       sortable: true
     },
     {
@@ -146,7 +146,7 @@ export default function SolarSearchField() {
       label: '総額リース料',
       minWidth: 130,
       align: 'right',
-      format: (value: number) => `¥${value.toLocaleString()}`,
+      format: (value: number) => `¥${value.toLocaleString('ja-JP')}`,
       sortable: true
     },
     { id: 'applicationCode', label: '申込コード', minWidth: 120, sortable: true }
@@ -162,7 +162,7 @@ export default function SolarSearchField() {
         region: region,
         roof_material: roofMaterial,
         installation_points: installationPoints,
-        application_power_output: applicationPowerOutput,
+        application_power_output: applicationPowerOutput || undefined,
         total_module_output_min: totalModuleOutputMin || undefined,
         total_module_output_max: totalModuleOutputMax || undefined,
         monthly_lease_fee_min: monthlyLeaseFeeMin || undefined,
@@ -173,6 +173,8 @@ export default function SolarSearchField() {
         total_lease_fee_max: totalLeaseFeeMax || undefined,
         application_code: applicationCode || undefined
       };
+
+      console.log('Sending application_power_output:', params.application_power_output);
 
       Object.keys(params).forEach(key => {
         if (params[key] === undefined || params[key] === '') {
@@ -195,13 +197,15 @@ export default function SolarSearchField() {
         region: item.region,
         roofMaterial: item.roof_material,
         installationPoints: item.installation_points,
-        monthlyLeaseFee: item.monthly_lease_fee_10,
-        monthlyLeaseFee10To15Year: item.monthly_lease_fee_15,
-        totalLeaseFee: item.total_lease_amount,
+        monthlyLeaseFee: Number(item.monthly_lease_fee_10),
+        monthlyLeaseFee10To15Year: item.monthly_lease_fee_15 ? Number(item.monthly_lease_fee_15) : null,
+        totalLeaseFee: Number(item.total_lease_amount),
         applicationCode: item.application_code,
       }));
 
       setSearchResults(formattedResults);
+
+      console.log('Formatted Results:', formattedResults);
     } catch (error: any) {
       if (error.response) {
         console.error('API Error Response:', {
@@ -214,7 +218,7 @@ export default function SolarSearchField() {
         alert(`検索エラー: ${errorMessage}`);
       } else {
         console.error('Unexpected error:', error);
-        alert('予期せぬエラーが発生��ました');
+        alert('予期せぬエラーが発生しました');
       }
     }
   };
@@ -373,7 +377,7 @@ export default function SolarSearchField() {
                   </>
                 )
               }}
-              sx={{ 
+              sx={{
                 width: '45%',
                 '& .MuiInputBase-root': {
                   height: '56px'
