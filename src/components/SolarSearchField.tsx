@@ -41,8 +41,9 @@ export default function SolarSearchField() {
   const [applicationCode, setApplicationCode] = useState<string>(""); // 申込コード
   const [monthlyLeaseFee10To15YearMin, setMonthlyLeaseFee10To15YearMin] = useState<string>("");
   const [monthlyLeaseFee10To15YearMax, setMonthlyLeaseFee10To15YearMax] = useState<string>("");
-  const [region, setRegion] = useState<string>("通常"); // 対応地域
+  const [region, setRegion] = useState<string>("通常"); // 対地域
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [installation, setInstallation] = useState<string>("false");
 
   const leaseCompanyOptions = [
     { value: "大阪ガスファイナンス", label: "大阪ガスファイナンス" },
@@ -81,6 +82,10 @@ export default function SolarSearchField() {
     { value: "通常", label: "通常" },
     { value: "多雪", label: "多雪" }
   ];
+  const installationOptions = [
+    { value: "false", label: "無" },
+    { value: "true", label: "有" }
+  ];
 
   const handleClear = () => {
     setLeaseCompany("");
@@ -101,6 +106,7 @@ export default function SolarSearchField() {
     setMonthlyLeaseFee10To15YearMax("");
     setRegion("通常");
     setSearchResults([]);
+    setInstallation("false");
   };
 
   const columns: Column[] = [
@@ -154,7 +160,7 @@ export default function SolarSearchField() {
 
   const handleSearch = async () => {
     try {
-      const params: { [key: string]: string | undefined } = {
+      const params: { [key: string]: string | boolean | undefined } = {
         lease_company: leaseCompany,
         lease_period: leasePeriod,
         module_model: moduleModel,
@@ -171,7 +177,8 @@ export default function SolarSearchField() {
         monthly_lease_fee_10_to_15_year_max: monthlyLeaseFee10To15YearMax || undefined,
         total_lease_fee_min: totalLeaseFeeMin || undefined,
         total_lease_fee_max: totalLeaseFeeMax || undefined,
-        application_code: applicationCode || undefined
+        application_code: applicationCode || undefined,
+        installation: installation === "true",
       };
 
       console.log('Sending application_power_output:', params.application_power_output);
@@ -242,6 +249,25 @@ export default function SolarSearchField() {
             options={regionOptions}
             value={region}
             onChange={setRegion}
+            row={true}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              mb: 1,
+              fontWeight: 'bold',
+              color: '#333'
+            }}
+          >
+            施工
+          </Typography>
+          <BasicRadioButton
+            label=""
+            options={installationOptions}
+            value={installation}
+            onChange={setInstallation}
             row={true}
           />
         </Grid>
