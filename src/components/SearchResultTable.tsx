@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useState } from 'react';
+import Checkbox from '@mui/material/Checkbox';
 
 // カラム定義の型
 export interface Column {
@@ -27,13 +28,17 @@ interface Props {
   rows: any[];
   defaultRowsPerPage?: number;
   rowsPerPageOptions?: number[];
+  selectedRows?: string[];
+  onSelectRow?: (id: string, checked: boolean) => void;
 }
 
 export default function SearchResultTable({ 
   columns, 
   rows,
   defaultRowsPerPage = 10,
-  rowsPerPageOptions = [10, 25, 100]
+  rowsPerPageOptions = [10, 25, 100],
+  selectedRows = [],
+  onSelectRow
 }: Props) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
@@ -86,6 +91,19 @@ export default function SearchResultTable({
         <Table stickyHeader aria-label="search results table">
           <TableHead>
             <TableRow>
+              <TableCell padding="checkbox" style={{ backgroundColor: '#fafafa' }}>
+                <Checkbox
+                  indeterminate={selectedRows.length > 0 && selectedRows.length < rows.length}
+                  checked={rows.length > 0 && selectedRows.length === rows.length}
+                  onChange={(event) => {
+                    if (onSelectRow) {
+                      rows.forEach(row => {
+                        onSelectRow(row.applicationCode, event.target.checked);
+                      });
+                    }
+                  }}
+                />
+              </TableCell>
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
@@ -127,6 +145,16 @@ export default function SearchResultTable({
                     }
                   }}
                 >
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedRows.includes(row.applicationCode)}
+                      onChange={(event) => {
+                        if (onSelectRow) {
+                          onSelectRow(row.applicationCode, event.target.checked);
+                        }
+                      }}
+                    />
+                  </TableCell>
                   {columns.map((column) => {
                     const value = row[column.id];
                     return (

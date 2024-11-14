@@ -6,13 +6,18 @@ import BasicRadioButton from "./BasicRadioButton";
 import { BasicButton } from "./BasicButton";
 import SearchResultTable, { Column } from './SearchResultTable';
 import axios from 'axios';
-
+import * as XLSX from 'xlsx';
 // レスポンスの型を定義
 interface SolarSystemResponse {
   lease_company: string;
   lease_period: string;
   module_model: string;
   module_count: string;
+  pcs_manufacturer: string;
+  //pcs_model: string;
+  //pcs_count: string;
+  //pcs_model2: string | null;
+  //pcs_count2: string | null;
   total_module_output: number;
   application_power_output: number;
   region: string;
@@ -29,6 +34,11 @@ export default function SolarSearchField() {
   const [leasePeriod, setLeasePeriod] = useState<string>(""); //リース期間
   const [moduleModel, setModuleModel] = useState<string>(""); //モジュールモデル
   const [moduleCount, setModuleCount] = useState<string>(""); //モジュール枚数
+  const [pcsManufacturer, setPcsManufacturer] = useState<string>("デルタ電子"); //PCSメーカー
+  //const [pcsModel, setPcsModel] = useState<string>(""); //PCSモデル
+  //const [pcsCount, setPcsCount] = useState<string>(""); //PCS台数
+  //const [pcsModel2, setPcsModel2] = useState<string | null>(null); //PCSモデル2
+  //const [pcsCount2, setPcsCount2] = useState<string | null>(null); //PCS台数2
   const [roofMaterial, setRoofMaterial] = useState<string>(""); //屋根材
   const [installationPoints, setInstallationPoints] = useState<string>(""); //施工
   const [applicationPowerOutput, setApplicationPowerOutput] = useState<string>(""); //申請出力
@@ -44,6 +54,46 @@ export default function SolarSearchField() {
   const [region, setRegion] = useState<string>("通常"); // 対地域
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [installation, setInstallation] = useState<string>("false");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
+  const handleRowSelect = (id: string, checked: boolean) => {
+    setSelectedRows(prev => 
+      checked 
+        ? [...prev, id]
+        : prev.filter(rowId => rowId !== id)
+    );
+  };
+
+  const handleExportExcel = () => {
+    if (selectedRows.length === 0) {
+      alert('エクスポートするデータを選択してください。');
+      return;
+    }
+
+    const selectedData = searchResults.filter(row => 
+      selectedRows.includes(row.applicationCode)
+    );
+
+    const worksheet = XLSX.utils.json_to_sheet(selectedData.map(row => ({
+      'リース会社': row.leaseCompany,
+      'リース期間': row.leasePeriod,
+      'パネル種類': row.moduleModel,
+      'パネル枚数': row.moduleCount,
+      'パネル合計出力': `${row.totalModuleOutput}kW`,
+      '申請出力': `${row.applicationPowerOutput}kW`,
+      '対応地域': row.region,
+      '屋根材': row.roofMaterial,
+      '施工点数': row.installationPoints,
+      '月額リース料(1~10年)': row.monthlyLeaseFee,
+      '月額リース料(10~15年)': row.monthlyLeaseFee10To15Year,
+      '総額リース料': row.totalLeaseFee,
+      '申込コード': row.applicationCode,
+    })));
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, '検索結果');
+    XLSX.writeFile(workbook, '太陽光発電システム検索結果.xlsx');
+  };
 
   const leaseCompanyOptions = [
     { value: "大阪ガスファイナンス", label: "大阪ガスファイナンス" },
@@ -57,9 +107,14 @@ export default function SolarSearchField() {
     { value: "SPR-MAX3-400", label: "maxeon 400W" },
     { value: "SS430M8GFH-18/VNH", label: "SI SOLAR 430W" }
   ];
+  const pcsManufacturerOptions = [
+    { value: "デルタ電子", label: "無" },
+    { value: "ダイヤゼブラ電機", label: "有" }
+  ];
   const roofMaterialOptions = [
     { value: "立平葺", label: "立平葺" },
     { value: "スレート", label: "スレート" },
+    { value: "横葺", label: "横葺" },
     { value: "瓦", label: "瓦" }
   ];
   const installationPointsOptions = [
@@ -92,6 +147,7 @@ export default function SolarSearchField() {
     setLeasePeriod("");
     setModuleModel("");
     setModuleCount("");
+    setPcsManufacturer("デルタ電子");
     setRoofMaterial("");
     setInstallationPoints("");
     setApplicationPowerOutput("");
@@ -112,6 +168,7 @@ export default function SolarSearchField() {
   const columns: Column[] = [
     { id: 'leaseCompany', label: 'リース会社', minWidth: 140, sortable: true },
     { id: 'leasePeriod', label: 'リース期間', minWidth: 100, sortable: true },
+    //PCSメーカー
     { id: 'moduleModel', label: 'パネル種類', minWidth: 130, sortable: true },
     { id: 'moduleCount', label: 'パネル枚数', minWidth: 100, sortable: true },
     {
@@ -165,6 +222,7 @@ export default function SolarSearchField() {
         lease_period: leasePeriod,
         module_model: moduleModel,
         module_count: moduleCount,
+        pcs_manufacturer: pcsManufacturer,
         region: region,
         roof_material: roofMaterial,
         installation_points: installationPoints,
@@ -199,6 +257,7 @@ export default function SolarSearchField() {
         leasePeriod: item.lease_period,
         moduleModel: item.module_model,
         moduleCount: item.module_count,
+        pcsManufacturer: item.pcs_manufacturer,
         totalModuleOutput: item.total_module_output,
         applicationPowerOutput: item.application_power_output,
         region: item.region,
@@ -233,7 +292,7 @@ export default function SolarSearchField() {
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
       <Grid container spacing={2}>
-        <Grid item xs={2}>
+        <Grid item xs={1}>
           <Typography
             variant="subtitle1"
             sx={{
@@ -252,7 +311,7 @@ export default function SolarSearchField() {
             row={true}
           />
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={1}>
           <Typography
             variant="subtitle1"
             sx={{
@@ -268,6 +327,25 @@ export default function SolarSearchField() {
             options={installationOptions}
             value={installation}
             onChange={setInstallation}
+            row={true}
+          />
+        </Grid>
+        <Grid item xs={1}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              mb: 1,
+              fontWeight: 'bold',
+              color: '#333'
+            }}
+          >
+            ハイブリッド
+          </Typography>
+          <BasicRadioButton
+            label=""
+            options={pcsManufacturerOptions}
+            value={pcsManufacturer}
+            onChange={setPcsManufacturer}
             row={true}
           />
         </Grid>
@@ -754,21 +832,29 @@ export default function SolarSearchField() {
       {searchResults.length > 0 && (
         <>
           <Box sx={{
-              paddingTop: '5rem',
-              display: 'flex',
-            }}>
-              <Typography
-                variant="h6"
-                component="h6"
-                sx={{
-                  fontFamily: "'Noto Sans JP', sans-serif",
-                  fontWeight: 600,
-                  color: '#444444',
-                  letterSpacing: '0.1em'
-                }}
-              >
-                検索結果
-              </Typography>
+            paddingTop: '5rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <Typography variant="h6" component="h6">
+              検索結果
+            </Typography>
+            <BasicButton
+              variant="contained"
+              onClick={handleExportExcel}
+              disabled={selectedRows.length === 0}
+              sx={{ 
+                backgroundColor: '#F7B52C',
+                boxShadow: 'none',
+                '&:hover': {
+                backgroundColor: '#FFC44D',
+                boxShadow: 'none'
+              }
+            }}
+          >
+              エクスポート
+            </BasicButton>
           </Box>
           <Box sx={{ mt: 4, width: '100%' }}>
             <SearchResultTable 
@@ -776,6 +862,8 @@ export default function SolarSearchField() {
               rows={searchResults}
               defaultRowsPerPage={10}
               rowsPerPageOptions={[10, 25, 100]}
+              selectedRows={selectedRows}
+              onSelectRow={handleRowSelect}
             />
           </Box>
         </>
