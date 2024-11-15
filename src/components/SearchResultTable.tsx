@@ -1,19 +1,17 @@
+import React, { useState, useEffect } from 'react';
 import {
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
-  Paper,
   TablePagination,
-  TableSortLabel
+  TableRow,
+  TableSortLabel,
+  Checkbox
 } from '@mui/material';
-import React from 'react';
-import { useState } from 'react';
-import Checkbox from '@mui/material/Checkbox';
 
-// カラム定義の型
 export interface Column {
   id: string;
   label: string;
@@ -28,16 +26,16 @@ interface Props {
   rows: any[];
   defaultRowsPerPage?: number;
   rowsPerPageOptions?: number[];
-  selectedRows?: string[];
-  onSelectRow?: (id: string, checked: boolean) => void;
+  selectedRows: string[];
+  onSelectRow: (id: string, checked: boolean) => void;
 }
 
-export default function SearchResultTable({ 
-  columns, 
+export default function SearchResultTable({
+  columns,
   rows,
   defaultRowsPerPage = 10,
   rowsPerPageOptions = [10, 25, 100],
-  selectedRows = [],
+  selectedRows,
   onSelectRow
 }: Props) {
   const [page, setPage] = useState(0);
@@ -45,19 +43,24 @@ export default function SearchResultTable({
   const [orderBy, setOrderBy] = useState<string>('');
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  const handleChangePage = (_event: unknown, newPage: number) => {
+  // ページ変更時にページを0にリセット
+  useEffect(() => {
+    setPage(0);
+  }, [rows]);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
-  const handleRequestSort = (property: string) => {
-    const isAsc = orderBy === property && order === 'asc';
+  const handleSort = (columnId: string) => {
+    const isAsc = orderBy === columnId && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
+    setOrderBy(columnId);
   };
 
   const sortedRows = React.useMemo(() => {
@@ -67,59 +70,70 @@ export default function SearchResultTable({
       const aValue = a[orderBy];
       const bValue = b[orderBy];
 
-      if (aValue === null) return 1;
-      if (bValue === null) return -1;
+      if (aValue === null) return order === 'asc' ? -1 : 1;
+      if (bValue === null) return order === 'asc' ? 1 : -1;
 
-      if (order === 'desc') {
-        return bValue < aValue ? -1 : bValue > aValue ? 1 : 0;
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return order === 'asc'
+          ? aValue.localeCompare(bValue, 'ja')
+          : bValue.localeCompare(aValue, 'ja');
       }
-      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+
+      return order === 'asc'
+        ? (aValue < bValue ? -1 : 1)
+        : (bValue < aValue ? -1 : 1);
     });
-  }, [rows, order, orderBy]);
+  }, [rows, orderBy, order]);
+
+  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelected = sortedRows.map(row => row.applicationCode);
+      newSelected.forEach(id => onSelectRow(id, true));
+    } else {
+      sortedRows.forEach(row => onSelectRow(row.applicationCode, false));
+    }
+  };
+
+  const currentPageRows = sortedRows.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  const isAllCurrentPageSelected = 
+    currentPageRows.length > 0 &&
+    currentPageRows.every(row => selectedRows.includes(row.applicationCode));
+
+  const isIndeterminate = 
+    currentPageRows.some(row => selectedRows.includes(row.applicationCode)) &&
+    !isAllCurrentPageSelected;
 
   return (
-    <Paper 
-      sx={{ 
-        width: '100%', 
-        overflow: 'hidden',
-        boxShadow: 'none',
-        border: '1px solid rgba(0, 0, 0, 0.12)',
-        borderRadius: '8px'
-      }}
-    >
+    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="search results table">
+        <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
               <TableCell padding="checkbox" style={{ backgroundColor: '#fafafa' }}>
                 <Checkbox
-                  indeterminate={selectedRows.length > 0 && selectedRows.length < rows.length}
-                  checked={rows.length > 0 && selectedRows.length === rows.length}
-                  onChange={(event) => {
-                    if (onSelectRow) {
-                      rows.forEach(row => {
-                        onSelectRow(row.applicationCode, event.target.checked);
-                      });
-                    }
-                  }}
+                  indeterminate={isIndeterminate}
+                  checked={isAllCurrentPageSelected}
+                  onChange={handleSelectAllClick}
                 />
               </TableCell>
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
                   align={column.align}
-                  style={{ 
+                  style={{
                     minWidth: column.minWidth,
-                    backgroundColor: '#fafafa',
-                    fontWeight: 600
+                    backgroundColor: '#fafafa'
                   }}
-                  sortDirection={orderBy === column.id ? order : false}
                 >
                   {column.sortable ? (
                     <TableSortLabel
                       active={orderBy === column.id}
                       direction={orderBy === column.id ? order : 'asc'}
-                      onClick={() => handleRequestSort(column.id)}
+                      onClick={() => handleSort(column.id)}
                     >
                       {column.label}
                     </TableSortLabel>
@@ -131,39 +145,28 @@ export default function SearchResultTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedRows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => (
-                <TableRow 
-                  hover 
-                  role="checkbox" 
-                  tabIndex={-1} 
-                  key={index}
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.04) !important'
-                    }
-                  }}
-                >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedRows.includes(row.applicationCode)}
-                      onChange={(event) => {
-                        if (onSelectRow) {
-                          onSelectRow(row.applicationCode, event.target.checked);
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  {columns.map((column) => {
-                    const value = row[column.id];
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        {column.format ? column.format(value) : value}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
+            {currentPageRows.map((row, index) => (
+              <TableRow
+                hover
+                role="checkbox"
+                tabIndex={-1}
+                key={row.applicationCode}
+              >
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selectedRows.includes(row.applicationCode)}
+                    onChange={(event) => onSelectRow(row.applicationCode, event.target.checked)}
+                  />
+                </TableCell>
+                {columns.map((column) => {
+                  const value = row[column.id];
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {column.format ? column.format(value) : value}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
             ))}
           </TableBody>
         </Table>

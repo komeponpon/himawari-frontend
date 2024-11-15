@@ -163,6 +163,7 @@ export default function SolarSearchField() {
     setRegion("通常");
     setSearchResults([]);
     setInstallation("false");
+    setSelectedRows([]);
   };
 
   const columns: Column[] = [
