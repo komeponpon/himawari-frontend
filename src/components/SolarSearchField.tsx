@@ -191,7 +191,7 @@ export default function SolarSearchField() {
     { id: 'installationPoints', label: '施工点数', minWidth: 100, sortable: true },
     {
       id: 'monthlyLeaseFee',
-      label: '月額リース料(1~10年)',
+      label: '月額リース料(1〜10年)',
       minWidth: 190,
       align: 'right',
       format: (value: number) => `¥${value.toLocaleString('ja-JP')}`,
@@ -199,7 +199,7 @@ export default function SolarSearchField() {
     },
     {
       id: 'monthlyLeaseFee10To15Year',
-      label: '月額リース料(10~15年)',
+      label: '月額リース料(10〜15年)',
       minWidth: 190,
       align: 'right',
       format: (value: number | null) => value ? `¥${value.toLocaleString('ja-JP')}` : '-',
