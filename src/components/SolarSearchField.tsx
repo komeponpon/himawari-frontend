@@ -23,7 +23,7 @@ interface SolarSystemResponse {
   region: string;
   roof_material: string;
   installation_points: string;
-  monthly_lease_fee_10: number;
+  monthly_lease_fee_10: number | null;
   monthly_lease_fee_15: number | null;
   total_lease_amount: number;
   application_code: string;
@@ -84,8 +84,8 @@ export default function SolarSearchField() {
       '対応地域': row.region,
       '屋根材': row.roofMaterial,
       '施工点数': row.installationPoints,
-      '月額リース料(1~10年)': row.monthlyLeaseFee,
-      '月額リース料(10~15年)': row.monthlyLeaseFee10To15Year,
+      '月額リース料(〜10年)': row.monthlyLeaseFee,
+      '月額リース料(〜15年)': row.monthlyLeaseFee10To15Year,
       '総額リース料': row.totalLeaseFee,
       '申込コード': row.applicationCode,
     })));
@@ -191,15 +191,15 @@ export default function SolarSearchField() {
     { id: 'installationPoints', label: '施工点数', minWidth: 100, sortable: true },
     {
       id: 'monthlyLeaseFee',
-      label: '月額リース料(1〜10年)',
+      label: '月額リース料（〜10年）',
       minWidth: 190,
       align: 'right',
-      format: (value: number) => `¥${value.toLocaleString('ja-JP')}`,
+      format: (value: number | null) => value ? `¥${value.toLocaleString('ja-JP')}` : '-',
       sortable: true
     },
     {
       id: 'monthlyLeaseFee10To15Year',
-      label: '月額リース料(10〜15年)',
+      label: '月額リース料（〜15年）',
       minWidth: 190,
       align: 'right',
       format: (value: number | null) => value ? `¥${value.toLocaleString('ja-JP')}` : '-',
@@ -207,8 +207,8 @@ export default function SolarSearchField() {
     },
     {
       id: 'totalLeaseFee',
-      label: '総額リース料',
-      minWidth: 130,
+      label: '総額リース料（税込）',
+      minWidth: 180,
       align: 'right',
       format: (value: number) => `¥${value.toLocaleString('ja-JP')}`,
       sortable: true
@@ -264,7 +264,7 @@ export default function SolarSearchField() {
         region: item.region,
         roofMaterial: item.roof_material,
         installationPoints: item.installation_points,
-        monthlyLeaseFee: Number(item.monthly_lease_fee_10),
+        monthlyLeaseFee: item.monthly_lease_fee_10 ? Number(item.monthly_lease_fee_10) : null,
         monthlyLeaseFee10To15Year: item.monthly_lease_fee_15 ? Number(item.monthly_lease_fee_15) : null,
         totalLeaseFee: Number(item.total_lease_amount),
         applicationCode: item.application_code,
@@ -312,6 +312,7 @@ export default function SolarSearchField() {
             row={true}
           />
         </Grid>
+        {/*
         <Grid item xs={1}>
           <Typography
             variant="subtitle1"
@@ -331,6 +332,8 @@ export default function SolarSearchField() {
             row={true}
           />
         </Grid>
+        */}
+        {/*
         <Grid item xs={1}>
           <Typography
             variant="subtitle1"
@@ -350,6 +353,8 @@ export default function SolarSearchField() {
             row={true}
           />
         </Grid>
+        */}
+        {/*
         <Grid item xs={2}>
           <Typography
             variant="subtitle1"
@@ -367,6 +372,7 @@ export default function SolarSearchField() {
             onChange={setLeaseCompany}
           />
         </Grid>
+        */}
         <Grid item xs={2}>
           <Typography
             variant="subtitle1"
@@ -551,7 +557,7 @@ export default function SolarSearchField() {
               color: '#444'
             }}
           >
-            リース料 月額1〜10年（税込）
+            月額リース料（〜10年）
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TextField
@@ -625,7 +631,7 @@ export default function SolarSearchField() {
                 color: '#444'
               }}
             >
-              リース料 月額10〜15年（税込）
+              月額リース料（〜15年）
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <TextField
@@ -699,7 +705,7 @@ export default function SolarSearchField() {
               color: '#444'
             }}
           >
-            リース料 総額（税込）
+            リース料総額（税込）
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TextField
