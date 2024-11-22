@@ -9,8 +9,12 @@ import {
   TablePagination,
   TableRow,
   TableSortLabel,
-  Checkbox
+  Checkbox,
+  Box,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
+import { styled, alpha } from '@mui/material/styles';
 
 export interface Column {
   id: string;
@@ -19,6 +23,7 @@ export interface Column {
   align?: 'right' | 'left' | 'center';
   format?: (value: any) => string;
   sortable?: boolean;
+  category?: 'details' | 'default';
 }
 
 interface Props {
@@ -29,6 +34,19 @@ interface Props {
   selectedRows: string[];
   onSelectRow: (id: string, checked: boolean) => void;
 }
+
+// スタイルをカスタマイズしたSwitchコンポーネントを作成
+const CustomSwitch = styled(Switch)(({ theme }) => ({
+  '& .MuiSwitch-switchBase.Mui-checked': {
+    color: '#F7B52C',
+    '&:hover': {
+      backgroundColor: alpha('#F7B52C', theme.palette.action.hoverOpacity),
+    },
+  },
+  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+    backgroundColor: '#F7B52C',
+  },
+}));
 
 export default function SearchResultTable({
   columns,
@@ -42,6 +60,13 @@ export default function SearchResultTable({
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
   const [orderBy, setOrderBy] = useState<string>('');
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  const [showDetails, setShowDetails] = useState(false);
+
+  // 表示するカラムをフィルタリング
+  const visibleColumns = columns.filter(column => 
+    !column.category || column.category === 'default' || 
+    (column.category === 'details' && showDetails)
+  );
 
   // ページ変更時にページを0にリセット
   useEffect(() => {
@@ -107,8 +132,23 @@ export default function SearchResultTable({
     currentPageRows.some(row => selectedRows.includes(row.applicationCode)) &&
     !isAllCurrentPageSelected;
 
+  const handleToggleDetails = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShowDetails(event.target.checked);
+  };
+
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden'}}>
+      <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end' }}>
+        <FormControlLabel
+          control={
+            <CustomSwitch
+              checked={showDetails}
+              onChange={handleToggleDetails}
+            />
+          }
+          label="部材情報を表示"
+        />
+      </Box>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -120,7 +160,7 @@ export default function SearchResultTable({
                   onChange={handleSelectAllClick}
                 />
               </TableCell>
-              {columns.map((column) => (
+              {visibleColumns.map((column) => (
                 <TableCell
                   key={column.id}
                   align={column.align}
@@ -158,7 +198,7 @@ export default function SearchResultTable({
                     onChange={(event) => onSelectRow(row.applicationCode, event.target.checked)}
                   />
                 </TableCell>
-                {columns.map((column) => {
+                {visibleColumns.map((column) => {
                   const value = row[column.id];
                   return (
                     <TableCell key={column.id} align={column.align}>

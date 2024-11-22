@@ -14,15 +14,20 @@ interface SolarSystemResponse {
   module_model: string;
   module_count: string;
   pcs_manufacturer: string;
-  //pcs_model: string;
-  //pcs_count: string;
-  //pcs_model2: string | null;
-  //pcs_count2: string | null;
+  pcs_model: string;
+  pcs_count: string;
+  pcs_model2: string | null;
+  pcs_count2: string | null;
   total_module_output: number;
   application_power_output: number;
   region: string;
   roof_material: string;
   installation_points: string;
+  module_pcs_cable_count: number;
+  bifurcated_count: number;
+  bracket_count: number;
+  installation: boolean;
+  sll: boolean;
   monthly_lease_fee_10: number | null;
   monthly_lease_fee_15: number | null;
   total_lease_amount: number;
@@ -84,6 +89,16 @@ export default function SolarSearchField() {
       '対応地域': row.region,
       '屋根材': row.roofMaterial,
       '施工点数': row.installationPoints,
+      'PCSメーカー': row.pcsManufacturer,
+      'PCS型番1': row.pcsModel,
+      'PCS台数1': row.pcsCount,
+      'PCS型番2': row.pcsModel2,
+      'PCS台数2': row.pcsCount2,
+      'ケーブル': row.modulePcsCableCount,
+      '二又コネクタ': row.bifurcatedCount,
+      '金具': row.bracketCount,
+      '施工': row.installation ? '有' : '無',
+      'SLL': row.sll ? '有' : '無',
       '月額リース料(〜10年)': row.monthlyLeaseFee,
       '月額リース料(〜15年)': row.monthlyLeaseFee10To15Year,
       '総額リース料': row.totalLeaseFee,
@@ -167,53 +182,41 @@ export default function SolarSearchField() {
   };
 
   const columns: Column[] = [
-    { id: 'leaseCompany', label: 'リース会社', minWidth: 140, sortable: true },
-    { id: 'leasePeriod', label: 'リース期間', minWidth: 100, sortable: true },
-    //PCSメーカー
-    { id: 'moduleModel', label: 'パネル種類', minWidth: 130, sortable: true },
-    { id: 'moduleCount', label: 'パネル枚数', minWidth: 100, sortable: true },
-    {
-      id: 'totalModuleOutput',
-      label: 'パネル合計出力',
-      minWidth: 130,
-      format: (value: number) => `${value}kW`,
-      sortable: true
-    },
-    {
-      id: 'applicationPowerOutput',
-      label: '申請出力',
-      minWidth: 100,
-      format: (value: number) => `${value}kW`,
-      sortable: true
-    },
-    { id: 'region', label: '対応地域', minWidth: 100, sortable: true },
-    { id: 'roofMaterial', label: '屋根材', minWidth: 100, sortable: true },
-    { id: 'installationPoints', label: '施工点数', minWidth: 100, sortable: true },
-    {
-      id: 'monthlyLeaseFee',
-      label: '月額リース料（〜10年）',
-      minWidth: 190,
-      align: 'right',
-      format: (value: number | null) => value ? `¥${value.toLocaleString('ja-JP')}` : '-',
-      sortable: true
-    },
-    {
-      id: 'monthlyLeaseFee10To15Year',
-      label: '月額リース料（〜15年）',
-      minWidth: 190,
-      align: 'right',
-      format: (value: number | null) => value ? `¥${value.toLocaleString('ja-JP')}` : '-',
-      sortable: true
-    },
-    {
-      id: 'totalLeaseFee',
-      label: '総額リース料（税込）',
-      minWidth: 180,
-      align: 'right',
-      format: (value: number) => `¥${value.toLocaleString('ja-JP')}`,
-      sortable: true
-    },
-    { id: 'applicationCode', label: '申込コード', minWidth: 120, sortable: true }
+    { id: 'leaseCompany', label: 'リース会社', minWidth: 140, align: 'left', sortable: true, category: 'default' },
+    { id: 'leasePeriod', label: 'リース期間', minWidth: 100, align: 'left', sortable: true, category: 'default' },
+    { id: 'moduleModel', label: 'パネル種類', minWidth: 130, align: 'left', sortable: true, category: 'default' },
+    { id: 'moduleCount', label: 'パネル枚数', minWidth: 100, align: 'left', sortable: true, category: 'default' },
+    { id: 'totalModuleOutput', label: 'パネル合計出力', minWidth: 130, align: 'left',
+      format: (value: number) => `${value}kW`, sortable: true, category: 'default' },
+    { id: 'applicationPowerOutput', label: '申請出力', minWidth: 100, align: 'left',
+      format: (value: number) => `${value}kW`, sortable: true, category: 'default' },
+    { id: 'region', label: '対応地域', minWidth: 100, align: 'left', sortable: true, category: 'default' },
+    { id: 'roofMaterial', label: '屋根材', minWidth: 100, align: 'left', sortable: true, category: 'default' },
+    { id: 'installationPoints', label: '施工点数', minWidth: 100, align: 'left', sortable: true, category: 'default' },
+    { id: 'pcsManufacturer', label: 'PCSメーカー', minWidth: 120, align: 'left', sortable: true, category: 'details' },
+    { id: 'pcsModel', label: 'PCS型番1', minWidth: 110, align: 'left', sortable: true, category: 'details' },
+    { id: 'pcsCount', label: 'PCS台数1', minWidth: 110, align: 'left',
+      format: (value: number) => `${value}台`, sortable: true, category: 'details' },
+    { id: 'pcsModel2', label: 'PCS型番2', minWidth: 110, align: 'left', sortable: true, category: 'details' },
+    { id: 'pcsCount2', label: 'PCS台数2', minWidth: 110, align: 'left',
+      format: (value: number | null) => value ? `${value}台` : '', sortable: true, category: 'details' },
+    { id: 'modulePcsCableCount', label: 'ケーブル', minWidth: 110, align: 'left',
+      format: (value: number) => `${value}本`, sortable: true, category: 'details' },
+    { id: 'bifurcatedCount', label: '二又コネクタ', minWidth: 110, align: 'left',
+      format: (value: number | null) => value ? `${value}個` : '', sortable: true, category: 'details' },
+    { id: 'bracketCount', label: '金具', minWidth: 110, align: 'left',
+      format: (value: number) => `${value}式`, sortable: true, category: 'details' },
+    { id: 'installation', label: '施工', minWidth: 110, align: 'left',
+      format: (value: boolean) => value ? '有' : '無', sortable: true, category: 'default' },
+    { id: 'sll', label: 'SLL', minWidth: 110, align: 'left',
+      format: (value: boolean) => value ? '有' : '無', sortable: true },
+    { id: 'monthlyLeaseFee', label: '月額リース料（〜10年）', minWidth: 190, align: 'right',
+      format: (value: number | null) => value ? `¥${value.toLocaleString('ja-JP')}` : '-', sortable: true },
+    { id: 'monthlyLeaseFee10To15Year', label: '月額リース料（〜15年）', minWidth: 190, align: 'right',
+      format: (value: number | null) => value ? `¥${value.toLocaleString('ja-JP')}` : '-', sortable: true },
+    { id: 'totalLeaseFee', label: '総額リース料（税込）', minWidth: 180, align: 'right',
+      format: (value: number) => `¥${value.toLocaleString('ja-JP')}`, sortable: true },
+    { id: 'applicationCode', label: '申込コード', minWidth: 130, align: 'center', sortable: true }
   ];
 
   const handleSearch = async () => {
@@ -264,6 +267,15 @@ export default function SolarSearchField() {
         region: item.region,
         roofMaterial: item.roof_material,
         installationPoints: item.installation_points,
+        pcsModel: item.pcs_model,
+        pcsCount: item.pcs_count,
+        pcsModel2: item.pcs_model2,
+        pcsCount2: item.pcs_count2,
+        modulePcsCableCount: item.module_pcs_cable_count,
+        bifurcatedCount: item.bifurcated_count,
+        bracketCount: item.bracket_count,
+        installation: item.installation,
+        sll: item.sll,
         monthlyLeaseFee: item.monthly_lease_fee_10 ? Number(item.monthly_lease_fee_10) : null,
         monthlyLeaseFee10To15Year: item.monthly_lease_fee_15 ? Number(item.monthly_lease_fee_15) : null,
         totalLeaseFee: Number(item.total_lease_amount),
