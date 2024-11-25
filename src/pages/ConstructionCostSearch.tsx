@@ -1,7 +1,7 @@
 import AppBarComponent from '../components/AppBar';
 import { Box, Typography } from '@mui/material';
-
-export default function InstallationSearch() {
+import ConstructionCostSearchField from '../components/ConstructionCostSearchField';
+export default function ConstructionCostSearch() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <AppBarComponent />
@@ -26,6 +26,7 @@ export default function InstallationSearch() {
             施工リースコード検索
           </Typography>
         </Box>
+        <ConstructionCostSearchField />
       </Box>
     </Box>
   )

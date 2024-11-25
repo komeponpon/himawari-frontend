@@ -20,7 +20,7 @@ const navigationCards = [
   {
     title: '施工リースコード検索',
     description: '施工のリースコードを検索できます',
-    path: '/installation-search',
+    path: '/construction-cost-search',
     image: installationImage
   }
 ];
