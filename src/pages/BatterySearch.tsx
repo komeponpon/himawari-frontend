@@ -1,6 +1,6 @@
 import AppBarComponent from '../components/AppBar';
 import { Box, Typography } from '@mui/material';
-
+import BatterySearchField from '../components/BatterySearchField';
 export default function BatterySearch() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -26,6 +26,7 @@ export default function BatterySearch() {
             蓄電池リースコード検索
           </Typography>
         </Box>
+        <BatterySearchField />
       </Box>
     </Box>
   )
