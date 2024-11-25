@@ -3,6 +3,7 @@ import BasicSelect from "./BasicSelect";
 import { useState } from "react";
 import ClearIcon from '@mui/icons-material/Clear';
 import { BasicButton } from "./BasicButton";
+import BasicRadioButton from "./BasicRadioButton";
 import SearchResultTable, { Column } from './SearchResultTable';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -20,6 +21,7 @@ interface BatteryResponse {
   total_lease_amount: number;
   customer_group: string;
   application_code: string;
+  installation: boolean;
 }
 
 export default function BatterySearchField() {
@@ -40,6 +42,7 @@ export default function BatterySearchField() {
   const [applicationCode, setApplicationCode] = useState<string>("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [installation, setInstallation] = useState<string>("false");
 
   // セレクトボックスのオプション定義
   const leaseCompanyOptions = [
@@ -53,13 +56,18 @@ export default function BatterySearchField() {
   ];
 
   const batteryManufacturerOptions = [
-    { value: "ELIIY Power", label: "ELIIY Power" },
-    { value: "Panasonic", label: "Panasonic" }
+    { value: "TESLA", label: "TESLA" },
+    { value: "ダイヤゼブラ電機", label: "ダイヤゼブラ電機" }
   ];
 
   const customerGroupOptions = [
     { value: "一般", label: "一般" },
     { value: "法人", label: "法人" }
+  ];
+
+  const installationOptions = [
+    { value: "false", label: "無" },
+    { value: "true", label: "有" }
   ];
 
   // 行選択のハンドラー
@@ -94,6 +102,7 @@ export default function BatterySearchField() {
       'リース料総額': `¥${row.totalLeaseAmount.toLocaleString()}`,
       '顧客区分': row.customerGroup,
       '申込コード': row.applicationCode,
+      '施工': row.installation ? '有' : '無'
     })));
 
     const workbook = XLSX.utils.book_new();
@@ -119,12 +128,13 @@ export default function BatterySearchField() {
     setApplicationCode("");
     setSearchResults([]);
     setSelectedRows([]);
+    setInstallation("false");
   };
 
   // 検索ハンドラー
   const handleSearch = async () => {
     try {
-      const params: { [key: string]: string | number | undefined } = {
+      const params: { [key: string]: string | number | boolean | undefined } = {
         lease_company: leaseCompany,
         lease_period: leasePeriod,
         battery_manufacturer: batteryManufacturer,
@@ -138,7 +148,8 @@ export default function BatterySearchField() {
         total_lease_amount_min: totalLeaseAmountMin || undefined,
         total_lease_amount_max: totalLeaseAmountMax || undefined,
         customer_group: customerGroup,
-        application_code: applicationCode
+        application_code: applicationCode,
+        installation: installation === "true"
       };
 
       Object.keys(params).forEach(key => {
@@ -163,6 +174,7 @@ export default function BatterySearchField() {
         totalLeaseAmount: item.total_lease_amount,
         customerGroup: item.customer_group,
         applicationCode: item.application_code,
+        installation: item.installation
       }));
 
       setSearchResults(formattedResults);
@@ -181,27 +193,48 @@ export default function BatterySearchField() {
   const columns: Column[] = [
     { id: 'leaseCompany', label: 'リース会社', minWidth: 140, align: 'left', sortable: true },
     { id: 'leasePeriod', label: 'リース期間', minWidth: 100, align: 'left', sortable: true },
-    { id: 'batteryManufacturer', label: 'バッテリーメーカー', minWidth: 160, align: 'left', sortable: true },
-    { id: 'model', label: 'モデル', minWidth: 130, align: 'left', sortable: true },
+    { id: 'batteryManufacturer', label: '蓄電池メーカー', minWidth: 160, align: 'left', sortable: true },
+    { id: 'model', label: '型式', minWidth: 130, align: 'left', sortable: true },
     { id: 'capacity', label: '容量', minWidth: 100, align: 'right',
       format: (value: number) => `${value}kWh`, sortable: true },
     { id: 'quantity', label: '数量', minWidth: 80, align: 'right',
       format: (value: number) => value.toString(), sortable: true },
-    { id: 'totalCapacity', label: '総容量', minWidth: 100, align: 'right',
+    { id: 'totalCapacity', label: '合計容量', minWidth: 100, align: 'right',
       format: (value: number) => `${value}kWh`, sortable: true },
     { id: 'monthlyLeaseFee', label: '月額リース料', minWidth: 130, align: 'right',
       format: (value: number) => `¥${value.toLocaleString()}`, sortable: true },
     { id: 'totalLeaseAmount', label: 'リース料総額', minWidth: 130, align: 'right',
       format: (value: number) => `¥${value.toLocaleString()}`, sortable: true },
-    { id: 'customerGroup', label: '顧客区分', minWidth: 100, align: 'left', sortable: true },
-    { id: 'applicationCode', label: '申込コード', minWidth: 130, align: 'center', sortable: true }
+    { id: 'applicationCode', label: '申込コード', minWidth: 130, align: 'center', sortable: true },
+    { id: 'installation', label: '施工', minWidth: 110, align: 'left',
+      format: (value: boolean) => value ? '有' : '無', sortable: true }
   ];
 
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
       <Grid container spacing={2}>
+        <Grid item xs={1}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              mb: 1,
+              fontWeight: 'bold',
+              color: '#444'
+            }}
+          >
+            施工
+          </Typography>
+          <BasicRadioButton
+            label=""
+            options={installationOptions}
+            value={installation}
+            onChange={setInstallation}
+            row={true}
+          />
+        </Grid>
+
         <Grid item xs={2}>
-          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#333' }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#444' }}>
             リース会社
           </Typography>
           <BasicSelect
@@ -212,7 +245,7 @@ export default function BatterySearchField() {
         </Grid>
 
         <Grid item xs={2}>
-          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#333' }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#444' }}>
             リース期間
           </Typography>
           <BasicSelect
@@ -223,8 +256,8 @@ export default function BatterySearchField() {
         </Grid>
 
         <Grid item xs={2}>
-          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#333' }}>
-            バッテリーメーカー
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#444' }}>
+            蓄電池メーカー
           </Typography>
           <BasicSelect
             options={batteryManufacturerOptions}
@@ -234,13 +267,14 @@ export default function BatterySearchField() {
         </Grid>
 
         <Grid item xs={3}>
-          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#333' }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#444' }}>
             総容量
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TextField
               size="small"
               type="number"
+              inputProps={{ min: "0" }}
               value={totalCapacityMin}
               onChange={(e) => setTotalCapacityMin(e.target.value)}
               InputProps={{
@@ -255,12 +289,18 @@ export default function BatterySearchField() {
                   </>
                 )
               }}
-              sx={{ width: '45%' }}
+              sx={{ 
+                width: '45%',
+                '& .MuiInputBase-root': {
+                  height: '56px'
+                }
+              }}
             />
             <Typography>~</Typography>
             <TextField
               size="small"
               type="number"
+              inputProps={{ min: "0" }}
               value={totalCapacityMax}
               onChange={(e) => setTotalCapacityMax(e.target.value)}
               InputProps={{
@@ -275,19 +315,25 @@ export default function BatterySearchField() {
                   </>
                 )
               }}
-              sx={{ width: '45%' }}
+              sx={{ 
+                width: '45%',
+                '& .MuiInputBase-root': {
+                  height: '56px'
+                }
+              }}
             />
           </Box>
         </Grid>
 
         <Grid item xs={3}>
-          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#333' }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#444' }}>
             月額リース料
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TextField
               size="small"
               type="number"
+              inputProps={{ min: "0" }}
               value={monthlyLeaseFeeMin}
               onChange={(e) => setMonthlyLeaseFeeMin(e.target.value)}
               InputProps={{
@@ -302,12 +348,18 @@ export default function BatterySearchField() {
                   </>
                 )
               }}
-              sx={{ width: '45%' }}
+              sx={{ 
+                width: '45%',
+                '& .MuiInputBase-root': {
+                  height: '56px'
+                }
+              }}
             />
             <Typography>~</Typography>
             <TextField
               size="small"
               type="number"
+              inputProps={{ min: "0" }}
               value={monthlyLeaseFeeMax}
               onChange={(e) => setMonthlyLeaseFeeMax(e.target.value)}
               InputProps={{
@@ -322,24 +374,77 @@ export default function BatterySearchField() {
                   </>
                 )
               }}
-              sx={{ width: '45%' }}
+              sx={{ 
+                width: '45%',
+                '& .MuiInputBase-root': {
+                  height: '56px'
+                }
+              }}
+            />
+          </Box>
+        </Grid>
+
+        <Grid item xs={3}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#444' }}>
+            リース料総額（税込）
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TextField
+              size="small"
+              type="number"
+              inputProps={{ min: "0" }}
+              value={totalLeaseAmountMin}
+              onChange={(e) => setTotalLeaseAmountMin(e.target.value)}
+              InputProps={{
+                endAdornment: (
+                  <>
+                    {totalLeaseAmountMin && (
+                      <IconButton size="small" onClick={() => setTotalLeaseAmountMin("")} sx={{ p: 0.5, mr: 0.5 }}>
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <Typography variant="caption">円</Typography>
+                  </>
+                )
+              }}
+              sx={{ 
+                width: '45%',
+                '& .MuiInputBase-root': {
+                  height: '56px'
+                }
+              }}
+            />
+            <Typography>~</Typography>
+            <TextField
+              size="small"
+              type="number"
+              inputProps={{ min: "0" }}
+              value={totalLeaseAmountMax}
+              onChange={(e) => setTotalLeaseAmountMax(e.target.value)}
+              InputProps={{
+                endAdornment: (
+                  <>
+                    {totalLeaseAmountMax && (
+                      <IconButton size="small" onClick={() => setTotalLeaseAmountMax("")} sx={{ p: 0.5, mr: 0.5 }}>
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <Typography variant="caption">円</Typography>
+                  </>
+                )
+              }}
+              sx={{ 
+                width: '45%',
+                '& .MuiInputBase-root': {
+                  height: '56px'
+                }
+              }}
             />
           </Box>
         </Grid>
 
         <Grid item xs={2}>
-          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#333' }}>
-            顧客区分
-          </Typography>
-          <BasicSelect
-            options={customerGroupOptions}
-            value={customerGroup}
-            onChange={setCustomerGroup}
-          />
-        </Grid>
-
-        <Grid item xs={2}>
-          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#333' }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold', color: '#444' }}>
             申込コード
           </Typography>
           <TextField
@@ -353,7 +458,12 @@ export default function BatterySearchField() {
                 </IconButton>
               )
             }}
-            sx={{ width: '100%' }}
+            sx={{ 
+              width: '100%',
+              '& .MuiInputBase-root': {
+                height: '56px'
+              }
+            }}
           />
         </Grid>
       </Grid>
