@@ -26,7 +26,7 @@ const Login: React.FC = () => {
       const response = await api.post('/api/auth/login', { userId, password });
       const { token, user } = response.data as { token: string; user: any };
       login(token, user);
-      navigate('/dashboard');
+      navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.error || 'ログインに失敗しました');
     }
